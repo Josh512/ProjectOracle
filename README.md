@@ -1,2 +1,2 @@
-# ProjectOracle
+# Project Oracle
 CVE Detector
