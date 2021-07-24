@@ -17,7 +17,7 @@ vulnerabilities_list = [results.get(key) for key in results if key not in ['info
 
 for item in vulnerabilities_list:
     for thing in item:
-        print(thing["cvelist"], thing["cvss"]["score"], thing["description"])
+        print(thing["cvelist"], thing["cvss"]["score"], thing["description"] + "\n" )
         #if re.search("2\.4\.[7-9]", thing["title"]):
             #print(json.dumps(thing, indent=4))
             #print(thing["cvelist"])
