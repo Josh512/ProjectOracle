@@ -8,6 +8,6 @@ results = nmap.nmap_version_detection(ip)
 
 for i in results[ip]['ports']:
     try:
-        print(i['service']['product'] + '/' + i['service']['version'])
+        print(i['service']['product'] + ' / ' + i['service']['version'])
     except:
         pass
