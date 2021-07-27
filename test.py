@@ -4,21 +4,23 @@ import json
 import re
 
 vulners_api = vulners.Vulners(api_key="DAUGMZHCAXHBC73D5MDIWRGXHLAP9P03QSWBJWXL2MGJ2W0B7GRKI5U8N334XWBQ")
-#results = vulners_api.searchExploit("Apache httpd 2.4.7")
 
 #print(json.dumps(results, indent=4))
 
 #_____________________________________________________________________________________
 
-results = vulners_api.softwareVulnerabilities("Apache httpd", "2.4.7")
-exploit_list = results.get('exploit')
-vulnerabilities_list = [results.get(key) for key in results if key not in ['info', 'blog', 'bugbounty']]
-#print(json.dumps(vulnerabilities_list, indent=4))
+#Create a variable to input multiple vunerabilities into a list
+library = [["Apache httpd", "2.4.7"], ["OpenSSH", "6.6"]]
+#Loop through vulnerability list to output CVE
+for vulnerability in library:
+    results = vulners_api.softwareVulnerabilities(vulnerability[0], vulnerability[1])
+    exploit_list = results.get('exploit')
+    vulnerabilities_list = [results.get(key) for key in results if key not in ['info', 'blog', 'bugbounty']]
+    for item in vulnerabilities_list:
+        for specific in item:
+            print(specific["cvelist"], "Score =", specific["cvss"]["score"], "\n", specific["title"], "\n" )
 
-for item in vulnerabilities_list:
-    for thing in item:
-        print(thing["cvelist"], "Score =", thing["cvss"]["score"], "\n", thing["title"], "\n" )
-        #if re.search("2\.4\.[7-9]", thing["title"]):
-            #print(json.dumps(thing, indent=4))
-            #print(thing["cvelist"])
-        #print(json.dumps(thing, indent=4))
+
+
+       
+
