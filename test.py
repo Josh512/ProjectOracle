@@ -20,7 +20,7 @@ while True:
 
 #NMAP service scan
 nmap = nmap3.Nmap()
-results = nmap.nmap_version_detection(ip, args='--host-timeout 5')
+results = nmap.nmap_version_detection(ip, args='--host-timeout 15')
 services = []
 data = {}
 '''
@@ -77,15 +77,19 @@ else:
 #Create a variable to input multiple vunerabilities into a list
 #library = [["Apache httpd", "2.4.7"], ["OpenSSH", "6.6"]]
 #Loop through vulnerability list to output CVE
+CVE_List = {}
 for vulnerability in services:
     results = vulners_api.softwareVulnerabilities(vulnerability[0], vulnerability[1])
     exploit_list = results.get('exploit')
     vulnerabilities_list = [results.get(key) for key in results if key not in ['info', 'blog', 'bugbounty']]
     for item in vulnerabilities_list:
         for specific in item:
-            print(specific["cvelist"], "Score =", specific["cvss"]["score"], "\n", specific["title"], "\n" )
+            cve = specific["cvelist"]
+            CVE_List[cve] = [[specific["cvss"]["score"], specific["title"]]
+            #print(specific["cvelist"], "Score =", specific["cvss"]["score"], "\n", specific["title"], "\n" )
+#print(CVE_List)
 
-
-
+#key = CVE number value = [score, description]
        
-
+for k in CVE_List:
+    print("{} Score ={} \n {} \n".format(k, CVE_List[k][0], CVE_List[k][1]))
