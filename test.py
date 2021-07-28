@@ -1,95 +1,98 @@
 #!/usr/bin/env python3
+
 import vulners
-import json
+#import json
 import re
 import nmap3
 
-vulners_api = vulners.Vulners(api_key="DAUGMZHCAXHBC73D5MDIWRGXHLAP9P03QSWBJWXL2MGJ2W0B7GRKI5U8N334XWBQ")
-
-#print(json.dumps(results, indent=4))
-
-#regular expression patter to find correctly formatted IP address
-ip_pattern = '([0-9]{1,3}\.){3}[0-9]{1,3}'
-#loop to ensure an IP address was added properly
-while True:
+def ip_add():
+    #regular expression patter to find correctly formatted IP address
+    ip_pattern = '([0-9]{1,3}\.){3}[0-9]{1,3}'
+    #ensure an IP address was added properly
     ip = input('Enter Target IP Address: ')
     if not re.match(ip_pattern, ip):
         print('Error: Not a valid IP address.')
+        ip_add()
     else:
-        break
+        nmap_scan(ip)
 
-#NMAP service scan
-nmap = nmap3.Nmap()
-results = nmap.nmap_version_detection(ip, args='--host-timeout 15')
-services = []
-data = {}
-'''
-This while loop ensures the IP address given is valid: 
-if no data is able to be collected, user is prompted to re enter IP
-'''
-while True:
+def nmap_scan(ip):
+    #NMAP service scan
+    nmap = nmap3.Nmap()
+    results = nmap.nmap_version_detection(ip, args='--host-timeout 15')
+    data = {}
     try:
         #data = all results generated from the scan
         data = results[ip]['ports']
-        break
     except:
         print('Error: Not a valid IP address')
-        while True:
-            ip = input('Enter Target IP Address: ')
-            if not re.match(ip_pattern, ip):
-                print('Error: Not a valid IP address.')
-            else:
-                break
-        break
+        ip_add()
+    services = []
+    #iterate through all of the data collected on services running
+    for i in data:
+        if i['state'] == 'closed':
+            continue
 
-#iterate through all of the data collected on services running
-for i in data:
-    if i['state'] == 'closed':
-        continue
-
-    #only grab version number, not excess information
-    if 'version' not in i['service']:
-        continue
-    if ' ' in i['service']['version']:
-        vNum = i['service']['version'].find(' ')
+        #only grab version number, not excess information
+        if 'version' not in i['service']:
+            continue
+        if ' ' in i['service']['version']:
+            vNum = i['service']['version'].find(' ')
+        else:
+            vNum = len(i['service']['version'])
+        '''
+        Samba versions are not detected by NMAP and will 
+        therefore not yeild worthwile data
+        '''
+        if 'product' not in i['service']:
+            continue
+        if i['service']['product'] != 'Samba smbd':
+            services.append([i['service']['product'], i['service']['version'][:vNum]])
+            #print(i['service']['product'] + ' / ' + i['service']['version'])
+        elif i['service']['product'] == 'Samba smbd':
+            #still document existence of Samba server
+            pass
+    print('\n')
+    if services != []:
+        print(services)
     else:
-        vNum = len(i['service']['version'])
-    '''
-    Samba versions are not detected by NMAP and will 
-    therefore not yeild worthwile data
-    '''
-    if 'product' not in i['service']:
-        continue
-    if i['service']['product'] != 'Samba smbd':
-        services.append([i['service']['product'], i['service']['version'][:vNum]])
-        #print(i['service']['product'] + ' / ' + i['service']['version'])
-    elif i['service']['product'] == 'Samba smbd':
-        #still document existence of Samba server
-        pass
-
-print('\n')
-if services != []:
-    print(services)
-else:
-    print('No open services detected.')
+        print('No open services detected.')
+    vulners_lib(services)
 #_____________________________________________________________________________________
 
 #Create a variable to input multiple vunerabilities into a list
 #library = [["Apache httpd", "2.4.7"], ["OpenSSH", "6.6"]]
 #Loop through vulnerability list to output CVE
-CVE_List = {}
-for vulnerability in services:
-    results = vulners_api.softwareVulnerabilities(vulnerability[0], vulnerability[1])
-    exploit_list = results.get('exploit')
-    vulnerabilities_list = [results.get(key) for key in results if key not in ['info', 'blog', 'bugbounty']]
-    for item in vulnerabilities_list:
-        for specific in item:
-            cve = specific["cvelist"]
-            CVE_List[cve] = [[specific["cvss"]["score"], specific["title"]]
-            #print(specific["cvelist"], "Score =", specific["cvss"]["score"], "\n", specific["title"], "\n" )
-#print(CVE_List)
+def vulners_lib(services):
+    vulners_api = vulners.Vulners(api_key="DAUGMZHCAXHBC73D5MDIWRGXHLAP9P03QSWBJWXL2MGJ2W0B7GRKI5U8N334XWBQ")
+    CVE_List = {}
+    for vulnerability in services:
+        results = vulners_api.softwareVulnerabilities(vulnerability[0], vulnerability[1])
+        exploit_list = results.get('exploit')
+        vulnerabilities_list = [results.get(key) for key in results if key not in ['info', 'blog', 'bugbounty']]
+        for item in vulnerabilities_list:
+            for specific in item:
+                i = tuple(specific["cvelist"])
+                score = specific["cvss"]["score"]
+                title = specific["title"]
+                if score == 0.0:
+                    continue
+                else:
+                    #key = CVE number
+                    #value = [score, description]
+                    CVE_List[i] = [score, title]
+                    #print(specific["cvelist"], "Score =", specific["cvss"]["score"], "\n", specific["title"], "\n" )
+    testing(CVE_List)
 
-#key = CVE number value = [score, description]
-       
-for k in CVE_List:
-    print("{} Score ={} \n {} \n".format(k, CVE_List[k][0], CVE_List[k][1]))
+def testing(CVE_List):
+    for k in CVE_List:
+        try:
+            print("{} Score = {} \n {} \n".format(k, CVE_List[k][0], CVE_List[k][1]))
+        except:
+            continue
+
+def main():
+    ip_add()
+
+if __name__ == '__main__':
+    main()
