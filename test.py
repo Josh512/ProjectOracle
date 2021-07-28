@@ -20,8 +20,7 @@ while True:
 
 #NMAP service scan
 nmap = nmap3.Nmap()
-results = nmap.nmap_version_detection(ip)
-
+results = nmap.nmap_version_detection(ip, args='--host-timeout 5')
 services = []
 data = {}
 '''
@@ -47,21 +46,25 @@ while True:
 for i in data:
     if i['state'] == 'closed':
         continue
-    try:
-        #only grab version number, not excess information
-        if ' ' in i['service']['version']:
-            vNum = i['service']['version'].find(' ')
-        '''
-        Samba versions are not detected by NMAP and will 
-        therefore not yeild worthwile data
-        '''
-        if i['service']['product'] != 'Samba smbd':
-            services.append([i['service']['product'], i['service']['version'][:vNum]])
-            # print(i['service']['product'] + ' / ' + i['service']['version'])
-        elif i['service']['product'] == 'Samba smbd':
-            #still document existence of Samba server
-            pass
-    except:
+
+    #only grab version number, not excess information
+    if 'version' not in i['service']:
+        continue
+    if ' ' in i['service']['version']:
+        vNum = i['service']['version'].find(' ')
+    else:
+        vNum = len(i['service']['version'])
+    '''
+    Samba versions are not detected by NMAP and will 
+    therefore not yeild worthwile data
+    '''
+    if 'product' not in i['service']:
+        continue
+    if i['service']['product'] != 'Samba smbd':
+        services.append([i['service']['product'], i['service']['version'][:vNum]])
+        #print(i['service']['product'] + ' / ' + i['service']['version'])
+    elif i['service']['product'] == 'Samba smbd':
+        #still document existence of Samba server
         pass
 
 print('\n')
