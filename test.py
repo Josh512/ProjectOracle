@@ -85,9 +85,10 @@ def vulners_lib(services):
     testing(CVE_List)
 
 def testing(CVE_List):
-    for k in CVE_List:
+    CVE_ListSorted = dict(sorted(CVE_List.items(), key=lambda item: item[1], reverse = True))
+    for k in CVE_ListSorted:
         try:
-            print("{} Score = {} \n {} \n".format(k, CVE_List[k][0], CVE_List[k][1]))
+            print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
         except:
             continue
 
