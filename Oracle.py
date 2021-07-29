@@ -31,7 +31,6 @@ def nmap_scan(ip):
     for i in data:
         if i['state'] == 'closed':
             continue
-
         #only grab version number, not excess information
         if 'version' not in i['service']:
             continue
@@ -39,17 +38,12 @@ def nmap_scan(ip):
             vNum = i['service']['version'].find(' ')
         else:
             vNum = len(i['service']['version'])
-        '''
-        Samba versions are not detected by NMAP and will 
-        therefore not yeild worthwile data
-        '''
         if 'product' not in i['service']:
             continue
         if i['service']['product'] != 'Samba smbd':
             services.append([i['service']['product'], i['service']['version'][:vNum]])
             #print(i['service']['product'] + ' / ' + i['service']['version'])
         elif i['service']['product'] == 'Samba smbd':
-            #still document existence of Samba server
             pass
     print('\n')
     if services != []:
@@ -63,6 +57,7 @@ def nmap_scan(ip):
 #Loop through vulnerability list to output CVE
 def vulners_lib(services):
     vulners_api = vulners.Vulners(api_key="DAUGMZHCAXHBC73D5MDIWRGXHLAP9P03QSWBJWXL2MGJ2W0B7GRKI5U8N334XWBQ")
+    global CVE_List
     CVE_List = {}
     for vulnerability in services:
         results = vulners_api.softwareVulnerabilities(vulnerability[0], vulnerability[1])
@@ -80,64 +75,77 @@ def vulners_lib(services):
                     #value = [score, description]
                     CVE_List[i] = [score, title]
                     
-    testing(CVE_List)
+    result()
 
-def testing(CVE_List):
+def result():
     #sort through list to organize output by CVE score highest to lowest
     CVE_ListSorted = dict(sorted(CVE_List.items(), key=lambda item: item[1], reverse = True))
-    Score = input("Enter minimum CVE score number or enter 'all': ")
+    Score = input("Enter minimum CVE score (1-10) or 'all': ")
+    numCheck = "([0-9]{1}|[0-9]{1}\.[0-9]{1})"
     #Print CVE by score
-    if str.lower(Score) == "all":
+    if str.lower(Score) == "all" or Score.strip() == '':
         for k in CVE_ListSorted:
             try:
                 print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
             except:
                 continue
-    if "9" in Score:
+    elif re.match(numCheck, Score):
         for k in CVE_ListSorted:
-            if float(CVE_ListSorted[k][0]) >= float(9):
+            if float(CVE_ListSorted[k][0]) >= float(Score):
                 try:
                     print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
                 except:
                     continue
             else:
                 continue
-    if "8" in Score:
-        for k in CVE_ListSorted:
-            if float(CVE_ListSorted[k][0]) >= float(8):
-                try:
-                    print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
-                except:
-                    continue
-            else:
-                continue
-    if "7" in Score:
-        for k in CVE_ListSorted:
-            if float(CVE_ListSorted[k][0]) >= float(7):
-                try:
-                    print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
-                except:
-                    continue
-            else:
-                continue
-    if "6" in Score:
-        for k in CVE_ListSorted:
-            if float(CVE_ListSorted[k][0]) >= float(6):
-                try:
-                    print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
-                except:
-                    continue
-            else:
-                continue
-    if "5" in Score:
-        for k in CVE_ListSorted:
-            if float(CVE_ListSorted[k][0]) >= float(5):
-                try:
-                    print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
-                except:
-                    continue
-            else:
-                continue
+    else:
+        print('Invalid input.')
+        result()
+    # if "9" in Score:
+    #     for k in CVE_ListSorted:
+    #         if float(CVE_ListSorted[k][0]) >= float(9):
+    #             try:
+    #                 print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
+    #             except:
+    #                 continue
+    #         else:
+    #             continue
+    # if "8" in Score:
+    #     for k in CVE_ListSorted:
+    #         if float(CVE_ListSorted[k][0]) >= float(8):
+    #             try:
+    #                 print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
+    #             except:
+    #                 continue
+    #         else:
+    #             continue
+    # if "7" in Score:
+    #     for k in CVE_ListSorted:
+    #         if float(CVE_ListSorted[k][0]) >= float(7):
+    #             try:
+    #                 print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
+    #             except:
+    #                 continue
+    #         else:
+    #             continue
+    # if "6" in Score:
+    #     for k in CVE_ListSorted:
+    #         if float(CVE_ListSorted[k][0]) >= float(6):
+    #             try:
+    #                 print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
+    #             except:
+    #                 continue
+    #         else:
+    #             continue
+    # if "5" in Score:
+    #     for k in CVE_ListSorted:
+    #         if float(CVE_ListSorted[k][0]) >= float(5):
+    #             try:
+    #                 print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
+    #             except:
+    #                 continue
+    #         else:
+    #             continue
     #for k in CVE_ListSorted:
         #try:
             #print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
