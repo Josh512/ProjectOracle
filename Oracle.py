@@ -3,17 +3,26 @@
 import vulners
 import re
 import nmap3
+import socket
 
 def ip_add():
     #regular expression patter to find correctly formatted IP address
     ip_pattern = '([0-9]{1,3}\.){3}[0-9]{1,3}'
+    url_pattern = '([a-zA-Z0-9]+)(\.[a-zA-Z]{2,5})'
     #ensure an IP address was added properly
-    ip = input('Enter Target IP Address: ')
-    if not re.match(ip_pattern, ip):
-        print('Error: Not a valid IP address.')
-        ip_add()
-    else:
+    ip = input('Enter Target IP or URL Address: ')
+    if re.match(url_pattern, ip):
+        try:
+            ip = socket.gethostbyname(ip)
+            nmap_scan(ip)
+        except:
+            print('Error: Not a valid target.')
+            ip_add()
+    elif re.match(ip_pattern, ip):
         nmap_scan(ip)
+    elif not re.match(ip_pattern, ip) or not re.match(url_pattern, ip):
+        print('Error: Not a valid target.')
+        ip_add()
 
 def nmap_scan(ip):
     #NMAP service scan
@@ -50,8 +59,8 @@ def nmap_scan(ip):
         print(services)
     else:
         print('No open services detected.')
+        clean_exit()
     vulners_lib(services)
-#_____________________________________________________________________________________
 
 #Create a variable to input multiple vunerabilities into a list
 #Loop through vulnerability list to output CVE
@@ -101,51 +110,6 @@ def result():
     else:
         print('Invalid input.')
         result()
-    # if "9" in Score:
-    #     for k in CVE_ListSorted:
-    #         if float(CVE_ListSorted[k][0]) >= float(9):
-    #             try:
-    #                 print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
-    #             except:
-    #                 continue
-    #         else:
-    #             continue
-    # if "8" in Score:
-    #     for k in CVE_ListSorted:
-    #         if float(CVE_ListSorted[k][0]) >= float(8):
-    #             try:
-    #                 print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
-    #             except:
-    #                 continue
-    #         else:
-    #             continue
-    # if "7" in Score:
-    #     for k in CVE_ListSorted:
-    #         if float(CVE_ListSorted[k][0]) >= float(7):
-    #             try:
-    #                 print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
-    #             except:
-    #                 continue
-    #         else:
-    #             continue
-    # if "6" in Score:
-    #     for k in CVE_ListSorted:
-    #         if float(CVE_ListSorted[k][0]) >= float(6):
-    #             try:
-    #                 print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
-    #             except:
-    #                 continue
-    #         else:
-    #             continue
-    # if "5" in Score:
-    #     for k in CVE_ListSorted:
-    #         if float(CVE_ListSorted[k][0]) >= float(5):
-    #             try:
-    #                 print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
-    #             except:
-    #                 continue
-    #         else:
-    #             continue
     #for k in CVE_ListSorted:
         #try:
             #print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
@@ -154,6 +118,9 @@ def result():
 
 def main():
     ip_add()
+
+def clean_exit():
+    pass
 
 if __name__ == '__main__':
     main()
