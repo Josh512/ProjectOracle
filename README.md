@@ -19,6 +19,7 @@ echo 'enter vulners API key' > /path/to/ProjectOracle/apiKey
 ___
 ### TROUBLESHOOTING
 If you are using Firefox and get the following error messages:
+
 ![image](https://user-images.githubusercontent.com/64572574/127598904-71dba5a8-2d18-4c9b-8615-496e958128b6.png)
 
 1. Open Firefox and type 'about:config' into the URL bar.
