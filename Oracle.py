@@ -57,10 +57,10 @@ def nmap_scan(ip):
     print('\n')
     if services != []:
         print(services)
+        vulners_lib(services)
     else:
         print('No open services detected.')
         clean_exit()
-    vulners_lib(services)
 
 #Create a variable to input multiple vunerabilities into a list
 #Loop through vulnerability list to output CVE
@@ -83,8 +83,11 @@ def vulners_lib(services):
                     #key = CVE number
                     #value = [score, description]
                     CVE_List[i] = [score, title]
-                    
-    result()
+    if len(CVE_List) != 0:       
+        result()
+    else:
+        print('No CVEs Detected.')
+        clean_exit()
 
 def result():
     #sort through list to organize output by CVE score highest to lowest
