@@ -4,6 +4,8 @@ import vulners
 import re
 import nmap3
 import socket
+import webbrowser
+import os
 
 def ip_add():
     #regular expression patter to find correctly formatted IP address
@@ -65,7 +67,18 @@ def nmap_scan(ip):
 #Create a variable to input multiple vunerabilities into a list
 #Loop through vulnerability list to output CVE
 def vulners_lib(services):
-    vulners_api = vulners.Vulners(api_key="DAUGMZHCAXHBC73D5MDIWRGXHLAP9P03QSWBJWXL2MGJ2W0B7GRKI5U8N334XWBQ")
+    if os.path.exists('./apiKey'):
+        key = open('./apiKey', 'r')
+        key_contents = key.readline().strip()
+        if key_contents != '':
+            vulners_api = vulners.Vulners(api_key=key_contents)
+        else:
+            new_key = input('Enter vulners api key: ')
+            vulners_api = vulners.Vulners(api_key=new_key)
+        key.close()
+    else:
+        new_key = input('Enter vulners api key: ')
+        vulners_api = vulners.Vulners(api_key=new_key)
     global CVE_List
     CVE_List = {}
     for vulnerability in services:
@@ -113,11 +126,18 @@ def result():
     else:
         print('Invalid input.')
         result()
-    #for k in CVE_ListSorted:
-        #try:
-            #print("{} Score = {} \n {} \n".format(k, CVE_ListSorted[k][0], CVE_ListSorted[k][1]))
-        #except:
-            #continue
+    browser()
+
+def browser():
+    question = input('Do you want more information on a specific CVE? :) [y/n]: ')
+    if question.lower() == 'n':
+        clean_exit()
+    elif question.lower() == 'y':
+        cve_name = input("Which CVE? ('CVE-1234-1234'): ")
+        webbrowser.open_new_tab('https://cve.mitre.org/cgi-bin/cvename.cgi?name=' + cve_name)
+        browser()
+    else:
+        browser()
 
 def main():
     ip_add()
