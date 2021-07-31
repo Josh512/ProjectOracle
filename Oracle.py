@@ -9,6 +9,7 @@ import os
 import requests
 import random
 
+#Art Header
 data = requests.get('http://artii.herokuapp.com/fonts_list')
 fontsArray = data.text.split('\n')
 font = 'graffiti'
@@ -19,6 +20,8 @@ text = 'Project Oracle'
 
 r = requests.get(f'http://artii.herokuapp.com/make?text={text}&font={font}')
 print(r.text)
+
+print('\n')
 
 def ip_add():
     #regular expression patter to find correctly formatted IP address
