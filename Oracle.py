@@ -6,6 +6,19 @@ import nmap3
 import socket
 import webbrowser
 import os
+import requests
+import random
+
+data = requests.get('http://artii.herokuapp.com/fonts_list')
+fontsArray = data.text.split('\n')
+font = 'graffiti'
+#font = random.choice(fontsArray)
+#print(font)
+
+text = 'Project Oracle'
+
+r = requests.get(f'http://artii.herokuapp.com/make?text={text}&font={font}')
+print(r.text)
 
 def ip_add():
     #regular expression patter to find correctly formatted IP address
