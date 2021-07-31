@@ -7,6 +7,10 @@ Go to the [Vulners website](https://vulners.com) and click on "Get Started" in t
 under the "API KEYS" tab, generate an API key with scope "api".
 ___
 ### REQUIRMENTS
+* NMAP is required in order to run.
+```bash
+sudo apt-get install nmap
+```
 ```bash
 pip install python3-nmap
 ```
