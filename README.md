@@ -11,12 +11,14 @@ ___
 ```bash
 sudo apt-get install nmap
 ```
+* You will need the nmap3 and vulners python libraries installed.
 ```bash
 pip install python3-nmap
 ```
 ```bash
 pip install -U vulners
 ```
+* Add your vulners API key to the apiKey file.
 ```bash
 echo 'enter vulners API key' > /path/to/ProjectOracle/apiKey
 ```
