@@ -7,17 +7,11 @@ import socket
 import webbrowser
 import os
 import requests
-import random
 
 #Art Header
 data = requests.get('http://artii.herokuapp.com/fonts_list')
-fontsArray = data.text.split('\n')
 font = 'graffiti'
-#font = random.choice(fontsArray)
-#print(font)
-
 text = 'Project Oracle'
-
 r = requests.get(f'http://artii.herokuapp.com/make?text={text}&font={font}')
 print(r.text)
 
