@@ -1,4 +1,4 @@
-Example of Project Oracle
+# Example of Project Oracle
 
 For running Project Oracle, the user will need to have nmap and python installed on their machine.
 
