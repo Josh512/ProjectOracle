@@ -74,7 +74,7 @@ def nmap_scan(ip):
             pass
     print('\n')
     if services != []:
-        print(services)
+        print(f'Services found: {services}')
         vulners_lib(services)
     else:
         print('No open services detected.')
