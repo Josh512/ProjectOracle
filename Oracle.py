@@ -8,15 +8,6 @@ import webbrowser
 import os
 import requests
 
-#Art Header
-data = requests.get('http://artii.herokuapp.com/fonts_list')
-font = 'graffiti'
-text = 'Project Oracle'
-r = requests.get(f'http://artii.herokuapp.com/make?text={text}&font={font}')
-print(r.text)
-
-print('\n')
-
 def ip_add():
     #regular expression patter to find correctly formatted IP address
     ip_pattern = '([0-9]{1,3}\.){3}[0-9]{1,3}'
@@ -63,7 +54,6 @@ def nmap_scan(ip):
             continue
         if i['service']['product'] != 'Samba smbd':
             services.append([i['service']['product'], i['service']['version'][:vNum]])
-            #print(i['service']['product'] + ' / ' + i['service']['version'])
         elif i['service']['product'] == 'Samba smbd':
             pass
     print('\n')
@@ -78,21 +68,26 @@ def nmap_scan(ip):
 #Loop through vulnerability list to output CVE
 def vulners_lib(services):
     if os.path.exists('./apiKey'):
-        key = open('./apiKey', 'r')
+        key = open('apiKey', 'r')
         key_contents = key.readline().strip()
+        key.close()
         if key_contents != '':
-            vulners_api = vulners.Vulners(api_key=key_contents)
-        else:
+                vulners_api = vulners.Vulners(api_key=key_contents)
+        elif key_contents == '' or key_contents == 'Enter your Vulners API key here.':
             new_key = input('Enter vulners api key: ')
             vulners_api = vulners.Vulners(api_key=new_key)
-        key.close()
+            f = open('apiKey', 'w')
+            f.write(new_key)
+            f.close()
     else:
         new_key = input('Enter vulners api key: ')
         vulners_api = vulners.Vulners(api_key=new_key)
+        f = open('apiKey', 'w')
+        f.write(new_key)
+        f.close()
     CVE_List = {}
     for vulnerability in services:
         results = vulners_api.softwareVulnerabilities(vulnerability[0], vulnerability[1])
-        exploit_list = results.get('exploit')
         vulnerabilities_list = [results.get(key) for key in results if key not in ['info', 'blog', 'bugbounty']]
         for item in vulnerabilities_list:
             for specific in item:
@@ -149,6 +144,12 @@ def browser():
         browser()
 
 def main():
+    #Art Header
+    font = 'graffiti'
+    text = 'Project Oracle'
+    r = requests.get(f'http://artii.herokuapp.com/make?text={text}&font={font}')
+    print(r.text)
+    print('\n')
     ip_add()
 
 def clean_exit():
