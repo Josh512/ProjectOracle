@@ -95,7 +95,6 @@ def vulners_lib(services):
     else:
         new_key = input('Enter vulners api key: ')
         vulners_api = vulners.Vulners(api_key=new_key)
-    global CVE_List
     CVE_List = {}
     for vulnerability in services:
         results = vulners_api.softwareVulnerabilities(vulnerability[0], vulnerability[1])
@@ -113,12 +112,12 @@ def vulners_lib(services):
                     #value = [score, description]
                     CVE_List[i] = [score, title]
     if len(CVE_List) != 0:       
-        result()
+        result(CVE_List)
     else:
         print('No CVEs Detected.')
         clean_exit()
 
-def result():
+def result(CVE_List):
     #sort through list to organize output by CVE score highest to lowest
     CVE_ListSorted = dict(sorted(CVE_List.items(), key=lambda item: item[1], reverse = True))
     Score = input("Enter minimum CVE score (1-10) or 'all': ")
