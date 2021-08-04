@@ -7,6 +7,8 @@ import socket
 import webbrowser
 import os
 import requests
+import sys
+import warnings
 
 def ip_add():
     #regular expression patter to find correctly formatted IP address
@@ -38,6 +40,7 @@ def nmap_scan(ip):
     except:
         print('Error: Not a valid IP address')
         ip_add()
+    global services
     services = []
     #iterate through all of the data collected on services running
     for i in data:
@@ -59,32 +62,54 @@ def nmap_scan(ip):
     print('\n')
     if services != []:
         print(f'Services found: {services}')
-        vulners_lib(services)
+        vulners_lib()
     else:
         print('No open services detected.')
         clean_exit()
 
 #Create a variable to input multiple vunerabilities into a list
 #Loop through vulnerability list to output CVE
-def vulners_lib(services):
+def vulners_lib():
+    warnings.simplefilter('ignore')
     if os.path.exists('./apiKey'):
         key = open('apiKey', 'r')
         key_contents = key.readline().strip()
         key.close()
         if key_contents != '':
+            try:
                 vulners_api = vulners.Vulners(api_key=key_contents)
+            except:
+                fixed_key = input('Incorrect API key used. Re enter key: ')
+                f = open('apiKey', 'w')
+                f.write(fixed_key)
+                f.close()
+                vulners_lib()
         elif key_contents == '' or key_contents == 'Enter your Vulners API key here.':
             new_key = input('Enter vulners api key: ')
+            try:
+                vulners_api = vulners.Vulners(api_key=new_key)
+                f = open('apiKey', 'w')
+                f.write(new_key)
+                f.close()
+            except:
+                fixed_key = input('Incorrect API key used. Re enter key: ')
+                f = open('apiKey', 'w')
+                f.write(fixed_key)
+                f.close()
+                vulners_lib()
+    else:
+        new_key = input('Enter vulners api key: ')
+        try:
             vulners_api = vulners.Vulners(api_key=new_key)
             f = open('apiKey', 'w')
             f.write(new_key)
             f.close()
-    else:
-        new_key = input('Enter vulners api key: ')
-        vulners_api = vulners.Vulners(api_key=new_key)
-        f = open('apiKey', 'w')
-        f.write(new_key)
-        f.close()
+        except:
+            fixed_key = input('Incorrect API key used. Re enter key: ')
+            f = open('apiKey', 'w')
+            f.write(fixed_key)
+            f.close()
+            vulners_lib()
     CVE_List = {}
     for vulnerability in services:
         results = vulners_api.softwareVulnerabilities(vulnerability[0], vulnerability[1])
@@ -153,7 +178,7 @@ def main():
     ip_add()
 
 def clean_exit():
-    pass
+    sys.exit(0)
 
 if __name__ == '__main__':
     main()
