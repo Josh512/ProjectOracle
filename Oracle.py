@@ -19,7 +19,7 @@ def ip_add():
     ip = input('Enter Target IP or URL Address: ')
     if re.match(url_pattern, ip):
         try:
-            ip = socket.gethostbyname(ip)
+            ip = socket.gethostbyname(ip.strip())
             nmap_scan(ip)
         except:
             print('Error: Not a valid target.')
