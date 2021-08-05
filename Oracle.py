@@ -11,6 +11,7 @@ import sys
 import warnings
 
 def ip_add():
+    '''Checks that you entered a correct IP address or converts a URL into an IP address to be used by NMAP'''
     #regular expression patter to find correctly formatted IP address
     ip_pattern = '([0-9]{1,3}\.){3}[0-9]{1,3}'
     url_pattern = '([a-zA-Z0-9]+)(\.[a-zA-Z]{2,5})'
@@ -30,9 +31,9 @@ def ip_add():
         ip_add()
 
 def nmap_scan(ip):
-    #NMAP service scan
+    '''NMAP service scan that identifies all running services and versions.'''
     nmap = nmap3.Nmap()
-    results = nmap.nmap_version_detection(ip, args='--host-timeout 15')
+    results = nmap.nmap_version_detection(ip, args='--host-timeout 20')
     data = {}
     try:
         #data = all results generated from the scan
@@ -67,9 +68,8 @@ def nmap_scan(ip):
         print('No open services detected.')
         clean_exit()
 
-#Create a variable to input multiple vunerabilities into a list
-#Loop through vulnerability list to output CVE
 def vulners_lib():
+    '''Identifies what CVEs are associated with all running services, if any.'''
     warnings.simplefilter('ignore')
     if os.path.exists('./apiKey'):
         key = open('apiKey', 'r')
@@ -132,6 +132,7 @@ def vulners_lib():
         clean_exit()
 
 def result(CVE_List):
+    '''Outputs the list of CVEs that were detected in vulners_lib.'''
     #sort through list to organize output by CVE score highest to lowest
     CVE_ListSorted = dict(sorted(CVE_List.items(), key=lambda item: item[1], reverse = True))
     Score = input("Enter minimum CVE score (1-10) or 'all': ")
@@ -158,6 +159,7 @@ def result(CVE_List):
     browser()
 
 def browser():
+    '''Will take user to the webpage of specific CVEs of their choosing.'''
     question = input('Do you want more information on a specific CVE? :) [y/n]: ')
     if question.lower() == 'n':
         clean_exit()
@@ -169,7 +171,7 @@ def browser():
         browser()
 
 def main():
-    #Art Header
+    '''Art Header'''
     font = 'graffiti'
     text = 'Project Oracle'
     r = requests.get(f'http://artii.herokuapp.com/make?text={text}&font={font}')
@@ -178,6 +180,7 @@ def main():
     ip_add()
 
 def clean_exit():
+    '''Just a clean way to exit the script.'''
     sys.exit(0)
 
 if __name__ == '__main__':
