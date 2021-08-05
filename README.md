@@ -7,6 +7,12 @@ Go to the [Vulners website](https://vulners.com) and click on "Get Started" in t
 under the "API KEYS" tab, generate an API key with scope "api".
 ___
 ### REQUIRMENTS
+* You can use the setup file to automate installation of all requirments.
+```bash
+sudo ./setup.sh
+```
+___
+### MANUAL SETUP
 * NMAP is required in order to run.
 ```bash
 sudo apt-get install nmap
