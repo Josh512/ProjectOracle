@@ -16,14 +16,16 @@ def ip_add():
     ip_pattern = '([0-9]{1,3}\.){3}[0-9]{1,3}'
     url_pattern = '([a-zA-Z0-9]+)(\.[a-zA-Z]{2,5})'
     #ensure an IP address was added properly
-    ip = input('Enter Target IP or URL Address: ')
+    ip = input('Enter Target IP or URL Address: ').strip()
     if re.match(url_pattern, ip):
         try:
-            ip = socket.gethostbyname(ip.strip())
+            ip = socket.gethostbyname(ip)
             nmap_scan(ip)
-        except:
+        except socket.gaierror:
             print('Error: Not a valid target.')
             ip_add()
+        except:
+            clean_exit()
     elif re.match(ip_pattern, ip):
         nmap_scan(ip)
     elif not re.match(ip_pattern, ip) or not re.match(url_pattern, ip):
@@ -110,6 +112,7 @@ def vulners_lib():
             f.write(fixed_key)
             f.close()
             vulners_lib()
+    global CVE_List
     CVE_List = {}
     for vulnerability in services:
         results = vulners_api.softwareVulnerabilities(vulnerability[0], vulnerability[1])
@@ -126,12 +129,12 @@ def vulners_lib():
                     #value = [score, description]
                     CVE_List[i] = [score, title]
     if len(CVE_List) != 0:       
-        result(CVE_List)
+        result()
     else:
         print('No CVEs Detected.')
         clean_exit()
 
-def result(CVE_List):
+def result():
     '''Outputs the list of CVEs that were detected in vulners_lib.'''
     #sort through list to organize output by CVE score highest to lowest
     CVE_ListSorted = dict(sorted(CVE_List.items(), key=lambda item: item[1], reverse = True))
