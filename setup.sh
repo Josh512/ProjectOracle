@@ -25,10 +25,12 @@ ColorPurple () {
 packages () {
     echo "$(ColorGreen 'Updating packages...')"
     apt-get update > /dev/null
+    echo "$(ColorGreen 'Installing Python 3...')"
+    apt-get install python3 > /dev/null
     echo "$(ColorGreen 'Installing NMAP...')"
     apt-get install nmap > /dev/null
     echo "$(ColorGreen 'Installing pip...')"
-    apt-get install pip > /dev/null
+    apt-get install python3-pip > /dev/null
     echo "\n $(ColorBlue 'Necessary packages installed. \n')"
 }
 
