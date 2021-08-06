@@ -23,7 +23,8 @@ ColorPurple () {
 }
 
 packages () {
-    # apt-get update
+    echo "$(ColorGreen 'Updating packages...')"
+    apt-get update > /dev/null
     echo "$(ColorGreen 'Installing NMAP...')"
     apt-get install nmap > /dev/null
     echo "$(ColorGreen 'Installing pip...')"
