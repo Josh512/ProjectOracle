@@ -175,10 +175,13 @@ def browser():
 
 def main():
     '''Art Header'''
-    font = 'graffiti'
-    text = 'Project Oracle'
-    r = requests.get(f'http://artii.herokuapp.com/make?text={text}&font={font}')
-    print(r.text)
+    # font = 'graffiti'
+    # text = 'Project Oracle'
+    # r = requests.get(f'http://artii.herokuapp.com/make?text={text}&font={font}')
+    # print(r.text)
+    # last ascii art generator broke :(
+    f = open('ascii_project-oracle.txt', 'r')
+    print(''.join([line for line in f]))
     print('\n')
     ip_add()
 
